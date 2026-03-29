@@ -44,15 +44,19 @@ func corsMiddleware(next http.HandlerFunc) http.HandlerFunc {
 }
 
 func main() {
-	err := godotenv.Load("config.env")
-	if err != nil {
-		log.Fatal("Error loading config.env: ", err)
+	// Load env for local only
+	_ = godotenv.Load("config.env")
+
+	// Use Render PORT or fallback
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = os.Getenv("PORT_PRODUCER")
+	}
+	if port == "" {
+		log.Fatal("No PORT found")
 	}
 
-	PORT := ":" + os.Getenv("PORT_PRODUCER")
-	if PORT == ":" {
-		log.Fatal("PORT_PRODUCER is not set in config.env")
-	}
+	PORT := ":" + port
 
 	rdb = connectRedis()
 
@@ -61,15 +65,14 @@ func main() {
 	}
 	log.Println("Connected to Redis successfully")
 
-	// ✅ Wrap handler with CORS middleware
 	http.HandleFunc("/enqueue", corsMiddleware(post_handler))
 
 	log.Println("Starting producer server on port", PORT)
-	if err = http.ListenAndServe(PORT, nil); err != nil {
+
+	if err := http.ListenAndServe(PORT, nil); err != nil {
 		log.Fatal("Error starting server: ", err)
 	}
 }
-
 func post_handler(w http.ResponseWriter, r *http.Request) {
 	r.Body = http.MaxBytesReader(w, r.Body, 1<<20)
 
