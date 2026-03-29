@@ -1,4 +1,10 @@
+<<<<<<< HEAD
 .env
 config.env
 .DS_Store
 logs.txt
+=======
+.envconfig.env
+.DS_Store
+logs.txt
+>>>>>>> 611bc97 (Clean unnecessary files)
