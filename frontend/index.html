@@ -382,7 +382,7 @@
     <!-- DASHBOARD PANEL -->
     <div class="panel active" id="panel-dashboard">
       <div class="note-banner">
-        <span>Note:</span> This dashboard connects to your local WorkQueue services.
+        <span>Note:</span> This dashboard connects to deployed WorkQueue services.
         Make sure <span>Producer</span> is on :8080 and <span>Worker</span> is on :8081.
         Metrics are polled every 3 seconds automatically.
       </div>
@@ -529,7 +529,7 @@
 const PRODUCER_URL = 'https://workqueue-producer-kz2k.onrender.com';
 
 // If worker NOT deployed → temporarily disable metrics
-const WORKER_URL = 'http://localhost:8081';
+const WORKER_URL = null;
 const POLL_MS      = 3000;
 
 // ── STATE ───────────────────────────────────────────────────
