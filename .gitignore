@@ -1,1 +1,4 @@
-.envconfig.env
+.env
+config.env
+.DS_Store
+logs.txt
