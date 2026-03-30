@@ -324,17 +324,6 @@ When both services run on your laptop, everything works. The moment you deploy t
 
 **Good tooling reveals bad code.** The Go compiler refusing to compile unused variables, the race detector finding concurrent writes, the linter flagging swallowed errors — these weren't annoyances. They were the compiler teaching me things. Every flag was a real bug I'd written.
 
----
-
-## 🔥 Roadmap
-
-- [ ] Persistent job history via Redis (replace localStorage)
-- [ ] Dead letter queue for failed jobs with retry UI
-- [ ] Job priority queues (high / normal / low)
-- [ ] Dynamic worker scaling via `POST /workers?count=N`
-- [ ] WebSocket push instead of polling
-- [ ] Docker Compose for one-command local setup
-- [ ] Authentication on dashboard and API
 
 ---
 
