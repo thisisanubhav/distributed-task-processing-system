@@ -556,45 +556,62 @@ function showPanel(name, btn) {
   if (name === 'workers') renderWorkersFull();
 }
 
-// ── METRICS ─────────────────────────────────────────────────
+// ── METRICS (REAL-TIME) ─────────────────────────────────────
 async function fetchMetrics() {
   try {
     const res = await fetch(WORKER_URL + '/metrics');
     if (!res.ok) throw new Error('non-200');
+
     const data = await res.json();
 
     const q    = data.total_jobs_in_queue ?? 0;
-    const done = data.jobs_done           ?? 0;
-    const fail = data.jobs_failed         ?? 0;
-    const total = done + fail;
-    const rate = total > 0 ? Math.round(done / total * 100) : 100;
+    const done = data.jobs_done ?? 0;
+    const fail = data.jobs_failed ?? 0;
 
+    const total = done + fail;
+    const rate  = total > 0 ? Math.round((done / total) * 100) : 100;
+
+    // ── Update UI ──
     document.getElementById('m-queue').textContent  = q;
     document.getElementById('m-done').textContent   = done;
     document.getElementById('m-failed').textContent = fail;
     document.getElementById('m-rate').textContent   = rate + '%';
-    document.getElementById('last-update').textContent =
-      new Date().toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'});
 
-    // update charts
-    queueHistory.push(q);   queueHistory.shift();
+    document.getElementById('last-update').textContent =
+      new Date().toLocaleTimeString([], {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      });
+
+    // ── Update charts ──
+    queueHistory.push(q);
+    queueHistory.shift();
+
     const delta = done - prevDone;
-    doneHistory.push(delta); doneHistory.shift();
+    doneHistory.push(delta > 0 ? delta : 0);
+    doneHistory.shift();
+
     prevDone = done;
 
     queueChart.data.datasets[0].data = [...queueHistory];
     queueChart.update('none');
+
     throughputChart.data.datasets[0].data = [...doneHistory];
     throughputChart.update('none');
 
-    // simulate worker states based on queue
+    // ── Worker simulation ──
     simulateWorkers(q, done);
     renderWorkersDash();
     renderWorkersFull();
-    document.getElementById('worker-summary').textContent =
-      workers.filter(w => w.status === 'busy').length + ' busy / ' + workers.length + ' total';
 
-  } catch(e) {
+    document.getElementById('worker-summary').textContent =
+      workers.filter(w => w.status === 'busy').length +
+      ' busy / ' + workers.length + ' total';
+
+  } catch (e) {
+    console.log("Metrics error:", e);
+
     document.getElementById('m-queue').textContent  = 'ERR';
     document.getElementById('m-done').textContent   = 'ERR';
     document.getElementById('m-failed').textContent = 'ERR';
@@ -602,6 +619,11 @@ async function fetchMetrics() {
   }
 }
 
+// ── INITIAL LOAD ──
+fetchMetrics();
+
+// ── AUTO REFRESH (REAL-TIME) ──
+setInterval(fetchMetrics, 2000); // every 2 seconds
 function simulateWorkers(qLen, done) {
   const taskTypes = ['send_email','resize_image','generate_pdf'];
   workers.forEach((w, i) => {
@@ -746,6 +768,7 @@ async function submitJob() {
       box.style.display = 'block';
       addToHistory({ type, status: 'queued', payload, worker: '–', time: new Date() });
       showToast('Task queued successfully');
+      await fetchMetrics();
     } else {
       box.className = 'response-box err';
       box.textContent = '✗ ' + text;
