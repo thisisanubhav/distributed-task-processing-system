@@ -7,422 +7,188 @@
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg:       #0d0f12;
-    --bg2:      #141720;
-    --bg3:      #1c2030;
-    --border:   #2a2f3d;
-    --border2:  #353c50;
-    --text:     #e4e8f0;
-    --muted:    #6b7591;
-    --dim:      #3a4155;
-    --purple:   #7c6ff7;
-    --purple2:  #9d98f9;
-    --green:    #3dd68c;
-    --red:      #f0645a;
-    --amber:    #f5a623;
-    --teal:     #2dd4bf;
-    --font-mono: 'IBM Plex Mono', monospace;
-    --font-sans: 'IBM Plex Sans', sans-serif;
+    --bg:#0d0f12;--bg2:#141720;--bg3:#1c2030;
+    --border:#2a2f3d;--border2:#353c50;
+    --text:#e4e8f0;--muted:#6b7591;--dim:#3a4155;
+    --purple:#7c6ff7;--purple2:#9d98f9;
+    --green:#3dd68c;--red:#f0645a;--amber:#f5a623;--teal:#2dd4bf;
+    --font-mono:'IBM Plex Mono',monospace;
+    --font-sans:'IBM Plex Sans',sans-serif;
   }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--text);font-family:var(--font-sans);font-size:14px;min-height:100vh;display:flex;flex-direction:column}
+  .app{display:flex;flex:1;min-height:0}
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  /* SIDEBAR */
+  .sidebar{width:200px;flex-shrink:0;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column}
+  .logo{padding:20px 18px 16px;border-bottom:1px solid var(--border)}
+  .logo-mark{font-family:var(--font-mono);font-size:13px;font-weight:600;color:var(--purple2);letter-spacing:.04em}
+  .logo-sub{font-size:10px;color:var(--muted);margin-top:2px;letter-spacing:.06em;text-transform:uppercase}
+  .nav{padding:12px 8px;flex:1}
+  .nav-item{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:6px;cursor:pointer;font-size:13px;color:var(--muted);transition:all .15s;margin-bottom:2px;border:1px solid transparent;font-family:var(--font-sans);background:none;width:100%;text-align:left}
+  .nav-item:hover{color:var(--text);background:var(--bg3)}
+  .nav-item.active{color:var(--purple2);background:rgba(124,111,247,.1);border-color:rgba(124,111,247,.2)}
+  .sidebar-footer{padding:14px 18px;border-top:1px solid var(--border);font-size:11px;color:var(--dim);font-family:var(--font-mono)}
+  .status-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);margin-right:5px;vertical-align:middle}
+  .status-dot.ok{background:var(--green);animation:blink 2s ease-in-out infinite}
+  .status-dot.err{background:var(--red);animation:none}
+  .status-dot.pending{background:var(--amber);animation:blink .6s ease-in-out infinite}
+  @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
 
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--font-sans);
-    font-size: 14px;
-    min-height: 100vh;
-    display: flex;
-  }
+  /* MAIN */
+  .main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+  .topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;border-bottom:1px solid var(--border);background:var(--bg2);flex-shrink:0}
+  .page-title{font-family:var(--font-mono);font-size:13px;color:var(--muted)}
+  .page-title span{color:var(--text)}
+  .topbar-right{display:flex;align-items:center;gap:12px}
+  .refresh-btn{background:var(--bg3);border:1px solid var(--border2);color:var(--muted);padding:5px 10px;border-radius:5px;font-family:var(--font-mono);font-size:11px;cursor:pointer;transition:all .15s}
+  .refresh-btn:hover{color:var(--text)}
+  .live-badge{display:flex;align-items:center;gap:5px;font-family:var(--font-mono);font-size:11px}
+  .live-badge.ok{color:var(--green)}
+  .live-badge.err{color:var(--red)}
+  .live-badge.pending{color:var(--amber)}
+  .content{flex:1;overflow-y:auto;padding:24px}
 
-  /* ── SIDEBAR ── */
-  .sidebar {
-    width: 200px;
-    flex-shrink: 0;
-    background: var(--bg2);
-    border-right: 1px solid var(--border);
-    display: flex;
-    flex-direction: column;
-    padding: 0;
-  }
+  /* PANELS */
+  .panel{display:none}
+  .panel.active{display:block;animation:fadeIn .2s ease-out}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 
-  .logo {
-    padding: 20px 18px 16px;
-    border-bottom: 1px solid var(--border);
-  }
-  .logo-mark {
-    font-family: var(--font-mono);
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--purple2);
-    letter-spacing: .04em;
-  }
-  .logo-sub {
-    font-size: 10px;
-    color: var(--muted);
-    margin-top: 2px;
-    letter-spacing: .06em;
-    text-transform: uppercase;
-  }
+  /* METRIC CARDS */
+  .metric-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+  .metric-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:16px;position:relative;overflow:hidden;transition:border-color .2s}
+  .metric-card:hover{border-color:var(--border2)}
+  .metric-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+  .metric-card.purple::before{background:var(--purple)}
+  .metric-card.green::before{background:var(--green)}
+  .metric-card.red::before{background:var(--red)}
+  .metric-card.amber::before{background:var(--amber)}
+  .metric-label{font-size:10px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;font-family:var(--font-mono);margin-bottom:10px}
+  .metric-value{font-family:var(--font-mono);font-size:28px;font-weight:600;line-height:1;transition:color .3s}
+  .metric-card.purple .metric-value{color:var(--purple2)}
+  .metric-card.green  .metric-value{color:var(--green)}
+  .metric-card.red    .metric-value{color:var(--red)}
+  .metric-card.amber  .metric-value{color:var(--amber)}
+  .metric-sub{font-size:10px;color:var(--dim);margin-top:6px;font-family:var(--font-mono)}
+  /* flash animation when value changes */
+  @keyframes flash{0%{opacity:.4}100%{opacity:1}}
+  .metric-value.flash{animation:flash .3s ease-out}
 
-  .nav { padding: 12px 8px; flex: 1; }
-  .nav-item {
-    display: flex; align-items: center; gap: 9px;
-    padding: 8px 10px; border-radius: 6px;
-    cursor: pointer; font-size: 13px; color: var(--muted);
-    transition: all .15s; margin-bottom: 2px;
-    border: 1px solid transparent;
-    font-family: var(--font-sans);
-    background: none;
-    width: 100%; text-align: left;
-  }
-  .nav-item:hover { color: var(--text); background: var(--bg3); }
-  .nav-item.active {
-    color: var(--purple2); background: rgba(124,111,247,.1);
-    border-color: rgba(124,111,247,.2);
-  }
-  .nav-icon { width: 16px; text-align: center; font-size: 14px; flex-shrink: 0; }
+  /* CHART */
+  .chart-section{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:18px;margin-bottom:24px}
+  .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+  .section-title{font-family:var(--font-mono);font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+  .chart-wrap{height:140px;position:relative}
 
-  .sidebar-footer {
-    padding: 14px 18px;
-    border-top: 1px solid var(--border);
-    font-size: 11px;
-    color: var(--dim);
-    font-family: var(--font-mono);
-  }
-  .status-dot {
-    display: inline-block; width: 6px; height: 6px;
-    border-radius: 50%; background: var(--green);
-    margin-right: 5px; vertical-align: middle;
-    animation: blink 2s ease-in-out infinite;
-  }
-  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+  /* WORKERS */
+  .workers-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .worker-card{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:12px;transition:border-color .3s,background .3s}
+  .worker-card.busy{border-color:var(--green);background:rgba(61,214,140,.05)}
+  .worker-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+  .worker-id{font-family:var(--font-mono);font-size:12px;color:var(--text)}
+  .worker-status{font-size:10px;padding:2px 7px;border-radius:20px;font-family:var(--font-mono);font-weight:500;transition:all .3s}
+  .worker-status.idle{background:rgba(107,117,145,.15);color:var(--muted)}
+  .worker-status.busy{background:rgba(61,214,140,.15);color:var(--green)}
+  .worker-task{font-size:11px;color:var(--dim);font-family:var(--font-mono);transition:color .3s}
+  .worker-task.active{color:var(--teal)}
 
-  /* ── MAIN ── */
-  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+  /* SUBMIT */
+  .form-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:24px;max-width:580px}
+  .form-group{margin-bottom:18px}
+  .form-label{display:block;font-family:var(--font-mono);font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:7px}
+  .form-input,.form-select{width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:9px 12px;border-radius:6px;font-family:var(--font-mono);font-size:13px;outline:none;transition:border-color .15s;appearance:none}
+  .form-input:focus,.form-select:focus{border-color:var(--purple)}
+  .dynamic-fields{display:flex;flex-direction:column;gap:12px}
+  .submit-btn{background:var(--purple);color:white;border:none;padding:10px 20px;border-radius:6px;font-family:var(--font-mono);font-size:13px;font-weight:500;cursor:pointer;transition:all .15s;width:100%}
+  .submit-btn:hover{background:var(--purple2);transform:translateY(-1px)}
+  .submit-btn:active{transform:translateY(0)}
+  .submit-btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+  .response-box{margin-top:14px;padding:12px 14px;border-radius:6px;font-family:var(--font-mono);font-size:12px;line-height:1.6;display:none}
+  .response-box.ok{background:rgba(61,214,140,.08);border:1px solid rgba(61,214,140,.25);color:var(--green)}
+  .response-box.err{background:rgba(240,100,90,.08);border:1px solid rgba(240,100,90,.25);color:var(--red)}
 
-  .topbar {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 14px 24px;
-    border-bottom: 1px solid var(--border);
-    background: var(--bg2);
-    flex-shrink: 0;
-  }
-  .page-title {
-    font-family: var(--font-mono); font-size: 13px;
-    color: var(--muted); font-weight: 400;
-  }
-  .page-title span { color: var(--text); }
+  /* HISTORY */
+  .history-toolbar{display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap;align-items:center}
+  .filter-btn{background:var(--bg3);border:1px solid var(--border);color:var(--muted);padding:5px 12px;border-radius:20px;font-family:var(--font-mono);font-size:11px;cursor:pointer;transition:all .15s}
+  .filter-btn:hover{color:var(--text)}
+  .filter-btn.active{background:rgba(124,111,247,.15);border-color:var(--purple);color:var(--purple2)}
+  .jobs-table{background:var(--bg2);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+  .table-header{display:grid;grid-template-columns:140px 80px 1fr 90px 80px;padding:10px 16px;border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+  .table-row{display:grid;grid-template-columns:140px 80px 1fr 90px 80px;padding:10px 16px;border-bottom:1px solid var(--border);font-family:var(--font-mono);font-size:12px;align-items:center;transition:background .12s}
+  .table-row:last-child{border-bottom:none}
+  .table-row:hover{background:var(--bg3)}
+  .status-badge{display:inline-block;font-size:10px;padding:2px 8px;border-radius:20px;font-weight:500}
+  .status-done{background:rgba(61,214,140,.12);color:var(--green)}
+  .status-failed{background:rgba(240,100,90,.12);color:var(--red)}
+  .status-queued{background:rgba(245,166,35,.12);color:var(--amber)}
+  .empty-state{text-align:center;padding:40px;font-family:var(--font-mono);font-size:12px;color:var(--dim)}
 
-  .topbar-right { display: flex; align-items: center; gap: 12px; }
-  .refresh-btn {
-    background: var(--bg3); border: 1px solid var(--border2);
-    color: var(--muted); padding: 5px 10px; border-radius: 5px;
-    font-family: var(--font-mono); font-size: 11px; cursor: pointer;
-    transition: all .15s;
-  }
-  .refresh-btn:hover { color: var(--text); border-color: var(--border2); }
-  .live-badge {
-    display: flex; align-items: center; gap: 5px;
-    font-family: var(--font-mono); font-size: 11px; color: var(--green);
-  }
+  /* ERROR BANNER */
+  .error-banner{background:rgba(240,100,90,.08);border:1px solid rgba(240,100,90,.25);border-radius:6px;padding:10px 14px;margin-bottom:20px;font-family:var(--font-mono);font-size:12px;color:var(--red);display:none}
 
-  .content { flex: 1; overflow-y: auto; padding: 24px; }
+  ::-webkit-scrollbar{width:4px}
+  ::-webkit-scrollbar-track{background:transparent}
+  ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+  .toast{position:fixed;bottom:24px;right:24px;background:var(--bg3);border:1px solid var(--border2);color:var(--text);padding:10px 16px;border-radius:6px;font-family:var(--font-mono);font-size:12px;opacity:0;transform:translateY(8px);transition:all .2s;pointer-events:none;z-index:100}
+  .toast.show{opacity:1;transform:translateY(0)}
 
-  /* ── PANELS ── */
-  .panel { display: none; }
-  .panel.active { display: block; }
-
-  /* ── METRIC CARDS ── */
-  .metric-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 12px;
-    margin-bottom: 24px;
-  }
-  .metric-card {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 16px;
-    position: relative;
-    overflow: hidden;
-    transition: border-color .2s;
-  }
-  .metric-card:hover { border-color: var(--border2); }
-  .metric-card::before {
-    content: ''; position: absolute;
-    top: 0; left: 0; right: 0; height: 2px;
-  }
-  .metric-card.purple::before { background: var(--purple); }
-  .metric-card.green::before  { background: var(--green); }
-  .metric-card.red::before    { background: var(--red); }
-  .metric-card.amber::before  { background: var(--amber); }
-
-  .metric-label {
-    font-size: 10px; color: var(--muted); letter-spacing: .08em;
-    text-transform: uppercase; font-family: var(--font-mono);
-    margin-bottom: 10px;
-  }
-  .metric-value {
-    font-family: var(--font-mono); font-size: 28px; font-weight: 600;
-    line-height: 1;
-    transition: all .3s;
-  }
-  .metric-card.purple .metric-value { color: var(--purple2); }
-  .metric-card.green  .metric-value { color: var(--green); }
-  .metric-card.red    .metric-value { color: var(--red); }
-  .metric-card.amber  .metric-value { color: var(--amber); }
-  .metric-sub { font-size: 10px; color: var(--dim); margin-top: 6px; font-family: var(--font-mono); }
-
-  /* ── CHART ── */
-  .chart-section {
-    background: var(--bg2); border: 1px solid var(--border);
-    border-radius: 8px; padding: 18px; margin-bottom: 24px;
-  }
-  .section-header {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 16px;
-  }
-  .section-title {
-    font-family: var(--font-mono); font-size: 12px;
-    color: var(--muted); text-transform: uppercase; letter-spacing: .08em;
-  }
-  .chart-wrap { height: 140px; position: relative; }
-  canvas { width: 100% !important; }
-
-  /* ── WORKERS ── */
-  .workers-grid {
-    display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
-  }
-  .worker-card {
-    background: var(--bg3); border: 1px solid var(--border);
-    border-radius: 6px; padding: 12px;
-    transition: border-color .2s;
-  }
-  .worker-card.busy { border-color: var(--green); background: rgba(61,214,140,.05); }
-  .worker-header {
-    display: flex; align-items: center; justify-content: space-between;
-    margin-bottom: 8px;
-  }
-  .worker-id { font-family: var(--font-mono); font-size: 12px; color: var(--text); }
-  .worker-status {
-    font-size: 10px; padding: 2px 7px; border-radius: 20px;
-    font-family: var(--font-mono); font-weight: 500;
-  }
-  .worker-status.idle { background: rgba(107,117,145,.15); color: var(--muted); }
-  .worker-status.busy { background: rgba(61,214,140,.15); color: var(--green); }
-  .worker-task { font-size: 11px; color: var(--dim); font-family: var(--font-mono); }
-  .worker-task.active { color: var(--teal); }
-
-  /* ── SUBMIT FORM ── */
-  .form-card {
-    background: var(--bg2); border: 1px solid var(--border);
-    border-radius: 8px; padding: 24px; max-width: 580px;
-  }
-  .form-group { margin-bottom: 18px; }
-  .form-label {
-    display: block; font-family: var(--font-mono); font-size: 11px;
-    color: var(--muted); text-transform: uppercase; letter-spacing: .08em;
-    margin-bottom: 7px;
-  }
-  .form-input, .form-select {
-    width: 100%; background: var(--bg3); border: 1px solid var(--border);
-    color: var(--text); padding: 9px 12px; border-radius: 6px;
-    font-family: var(--font-mono); font-size: 13px;
-    outline: none; transition: border-color .15s;
-    appearance: none;
-  }
-  .form-input:focus, .form-select:focus { border-color: var(--purple); }
-  .form-select { cursor: pointer; }
-  .dynamic-fields { display: flex; flex-direction: column; gap: 12px; }
-
-  .submit-btn {
-    background: var(--purple); color: white;
-    border: none; padding: 10px 20px; border-radius: 6px;
-    font-family: var(--font-mono); font-size: 13px; font-weight: 500;
-    cursor: pointer; transition: all .15s; width: 100%;
-    letter-spacing: .02em;
-  }
-  .submit-btn:hover { background: var(--purple2); transform: translateY(-1px); }
-  .submit-btn:active { transform: translateY(0); }
-  .submit-btn:disabled { opacity: .4; cursor: not-allowed; transform: none; }
-
-  .response-box {
-    margin-top: 14px; padding: 12px 14px; border-radius: 6px;
-    font-family: var(--font-mono); font-size: 12px; line-height: 1.6;
-    display: none;
-  }
-  .response-box.ok  { background: rgba(61,214,140,.08); border: 1px solid rgba(61,214,140,.25); color: var(--green); }
-  .response-box.err { background: rgba(240,100,90,.08);  border: 1px solid rgba(240,100,90,.25);  color: var(--red); }
-
-  /* ── JOB HISTORY ── */
-  .history-toolbar {
-    display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; align-items: center;
-  }
-  .filter-btn {
-    background: var(--bg3); border: 1px solid var(--border);
-    color: var(--muted); padding: 5px 12px; border-radius: 20px;
-    font-family: var(--font-mono); font-size: 11px; cursor: pointer;
-    transition: all .15s;
-  }
-  .filter-btn:hover { color: var(--text); }
-  .filter-btn.active { background: rgba(124,111,247,.15); border-color: var(--purple); color: var(--purple2); }
-
-  .jobs-table {
-    background: var(--bg2); border: 1px solid var(--border);
-    border-radius: 8px; overflow: hidden;
-  }
-  .table-header {
-    display: grid;
-    grid-template-columns: 140px 80px 1fr 90px 80px;
-    padding: 10px 16px;
-    border-bottom: 1px solid var(--border);
-    font-family: var(--font-mono); font-size: 10px;
-    color: var(--muted); text-transform: uppercase; letter-spacing: .08em;
-  }
-  .table-row {
-    display: grid;
-    grid-template-columns: 140px 80px 1fr 90px 80px;
-    padding: 10px 16px; border-bottom: 1px solid var(--border);
-    font-family: var(--font-mono); font-size: 12px;
-    align-items: center; transition: background .12s;
-  }
-  .table-row:last-child { border-bottom: none; }
-  .table-row:hover { background: var(--bg3); }
-
-  .status-badge {
-    display: inline-block; font-size: 10px; padding: 2px 8px;
-    border-radius: 20px; font-weight: 500;
-  }
-  .status-done   { background: rgba(61,214,140,.12); color: var(--green); }
-  .status-failed { background: rgba(240,100,90,.12);  color: var(--red); }
-  .status-queued { background: rgba(245,166,35,.12);  color: var(--amber); }
-
-  .empty-state {
-    text-align: center; padding: 40px;
-    font-family: var(--font-mono); font-size: 12px; color: var(--dim);
-  }
-
-  /* ── SCROLLBAR ── */
-  ::-webkit-scrollbar { width: 4px; }
-  ::-webkit-scrollbar-track { background: transparent; }
-  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
-
-  /* ── TOAST ── */
-  .toast {
-    position: fixed; bottom: 24px; right: 24px;
-    background: var(--bg3); border: 1px solid var(--border2);
-    color: var(--text); padding: 10px 16px; border-radius: 6px;
-    font-family: var(--font-mono); font-size: 12px;
-    opacity: 0; transform: translateY(8px);
-    transition: all .2s; pointer-events: none; z-index: 100;
-  }
-  .toast.show { opacity: 1; transform: translateY(0); }
-
-  /* ── ANIMATIONS ── */
-  @keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
-  .panel.active { animation: fadeIn .2s ease-out; }
-
-  /* ── NOTE BANNER ── */
-  .note-banner {
-    background: rgba(124,111,247,.08); border: 1px solid rgba(124,111,247,.2);
-    border-radius: 6px; padding: 10px 14px; margin-bottom: 20px;
-    font-family: var(--font-mono); font-size: 11px; color: var(--muted);
-    line-height: 1.6;
-  }
-  .note-banner span { color: var(--purple2); }
+  footer{width:100%;text-align:center;padding:10px 0;font-family:var(--font-mono);font-size:11px;color:var(--dim);border-top:1px solid var(--border);background:var(--bg2);flex-shrink:0}
 </style>
 </head>
 <body>
-
-<!-- SIDEBAR -->
+<div class="app">
 <aside class="sidebar">
   <div class="logo">
     <div class="logo-mark">WorkQueue</div>
     <div class="logo-sub">Admin Console</div>
   </div>
   <nav class="nav">
-    <button class="nav-item active" onclick="showPanel('dashboard', this)">
-      <span class="nav-icon">▤</span> Dashboard
-    </button>
-    <button class="nav-item" onclick="showPanel('submit', this)">
-      <span class="nav-icon">⊕</span> Submit job
-    </button>
-    <button class="nav-item" onclick="showPanel('history', this)">
-      <span class="nav-icon">≡</span> Job history
-    </button>
-    <button class="nav-item" onclick="showPanel('workers', this)">
-      <span class="nav-icon">◈</span> Workers
-    </button>
+    <button class="nav-item active" onclick="showPanel('dashboard',this)"><span class="nav-icon">▤</span> Dashboard</button>
+    <button class="nav-item" onclick="showPanel('submit',this)"><span class="nav-icon">⊕</span> Submit job</button>
+    <button class="nav-item" onclick="showPanel('history',this)"><span class="nav-icon">≡</span> Job history</button>
+    <button class="nav-item" onclick="showPanel('workers',this)"><span class="nav-icon">◈</span> Workers</button>
   </nav>
   <div class="sidebar-footer">
-    <div><span class="status-dot"></span>producer :8080</div>
-    <div style="margin-top:4px"><span class="status-dot"></span>worker :8081</div>
-    <div style="margin-top:4px;color:var(--dim)" id="last-update">–</div>
+    <div><span class="status-dot pending" id="dot-producer"></span><span id="lbl-producer">producer</span></div>
+    <div style="margin-top:4px"><span class="status-dot pending" id="dot-worker"></span><span id="lbl-worker">worker</span></div>
+    <div style="margin-top:8px;color:var(--dim)" id="last-update">connecting...</div>
+    <div style="margin-top:4px;color:var(--dim)" id="poll-count">polls: 0</div>
   </div>
 </aside>
 
-<!-- MAIN -->
 <main class="main">
   <header class="topbar">
     <div class="page-title" id="page-title">/ <span>dashboard</span></div>
     <div class="topbar-right">
-      <div class="live-badge">
-        <span class="status-dot"></span>
-        <span id="poll-label">auto-refresh: on</span>
+      <div class="live-badge pending" id="live-badge">
+        <span class="status-dot pending" id="dot-top"></span>
+        <span id="live-label">connecting...</span>
       </div>
-      <button class="refresh-btn" onclick="fetchMetrics()">↺ refresh</button>
+      <button class="refresh-btn" onclick="poll()">↺ refresh</button>
     </div>
   </header>
 
   <div class="content">
 
-    <!-- DASHBOARD PANEL -->
+    <!-- DASHBOARD -->
     <div class="panel active" id="panel-dashboard">
-      <div class="note-banner">
-        <span>Note:</span> This dashboard connects to deployed WorkQueue services.
-        Make sure <span>Producer</span> is on :8080 and <span>Worker</span> is on :8081.
-        Metrics are polled every 3 seconds automatically.
-      </div>
+      <div class="error-banner" id="error-banner"></div>
 
-      <!-- Metric cards -->
       <div class="metric-grid">
-        <div class="metric-card purple">
-          <div class="metric-label">in queue</div>
-          <div class="metric-value" id="m-queue">–</div>
-          <div class="metric-sub">waiting for workers</div>
-        </div>
-        <div class="metric-card green">
-          <div class="metric-label">jobs done</div>
-          <div class="metric-value" id="m-done">–</div>
-          <div class="metric-sub">processed total</div>
-        </div>
-        <div class="metric-card red">
-          <div class="metric-label">jobs failed</div>
-          <div class="metric-value" id="m-failed">–</div>
-          <div class="metric-sub">errors encountered</div>
-        </div>
-        <div class="metric-card amber">
-          <div class="metric-label">success rate</div>
-          <div class="metric-value" id="m-rate">–</div>
-          <div class="metric-sub">done / (done + failed)</div>
-        </div>
+        <div class="metric-card purple"><div class="metric-label">in queue</div><div class="metric-value" id="m-queue">–</div><div class="metric-sub">waiting for workers</div></div>
+        <div class="metric-card green"><div class="metric-label">jobs done</div><div class="metric-value" id="m-done">–</div><div class="metric-sub">processed total</div></div>
+        <div class="metric-card red"><div class="metric-label">jobs failed</div><div class="metric-value" id="m-failed">–</div><div class="metric-sub">errors encountered</div></div>
+        <div class="metric-card amber"><div class="metric-label">success rate</div><div class="metric-value" id="m-rate">–</div><div class="metric-sub">done / (done + failed)</div></div>
       </div>
 
-      <!-- Chart -->
       <div class="chart-section">
         <div class="section-header">
           <div class="section-title">queue depth — last 30 polls</div>
-          <div style="font-family:var(--font-mono);font-size:11px;color:var(--dim)">3s interval</div>
+          <div style="font-family:var(--font-mono);font-size:11px;color:var(--dim)" id="interval-label">polling every 3s</div>
         </div>
-        <div class="chart-wrap">
-          <canvas id="queue-chart"></canvas>
-        </div>
+        <div class="chart-wrap"><canvas id="queue-chart"></canvas></div>
       </div>
 
-      <!-- Workers mini -->
       <div class="chart-section">
         <div class="section-header">
           <div class="section-title">worker goroutines</div>
@@ -432,11 +198,10 @@
       </div>
     </div>
 
-    <!-- SUBMIT PANEL -->
+    <!-- SUBMIT -->
     <div class="panel" id="panel-submit">
       <div class="form-card">
-        <div class="section-title" style="margin-bottom:20px">enqueue a new task</div>
-
+        <div style="font-family:var(--font-mono);font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:20px">enqueue a new task</div>
         <div class="form-group">
           <label class="form-label">task type</label>
           <select class="form-select" id="task-type" onchange="updateFields()">
@@ -445,420 +210,391 @@
             <option value="generate_pdf">generate_pdf</option>
           </select>
         </div>
-
         <div class="form-group">
           <label class="form-label">retries</label>
           <input type="number" class="form-input" id="task-retries" value="3" min="0" max="10">
         </div>
-
         <div class="form-group">
           <label class="form-label">payload</label>
           <div class="dynamic-fields" id="dynamic-fields"></div>
         </div>
-
-        <button class="submit-btn" id="submit-btn" onclick="submitJob()">
-          submit task →
-        </button>
-
+        <button class="submit-btn" id="submit-btn" onclick="submitJob()">submit task →</button>
         <div class="response-box" id="response-box"></div>
       </div>
     </div>
 
-    <!-- HISTORY PANEL -->
+    <!-- HISTORY -->
     <div class="panel" id="panel-history">
       <div class="history-toolbar">
-        <button class="filter-btn active" onclick="filterJobs('all', this)">all</button>
-        <button class="filter-btn" onclick="filterJobs('done', this)">done</button>
-        <button class="filter-btn" onclick="filterJobs('failed', this)">failed</button>
-        <button class="filter-btn" onclick="filterJobs('queued', this)">queued</button>
+        <button class="filter-btn active" onclick="filterJobs('all',this)">all</button>
+        <button class="filter-btn" onclick="filterJobs('done',this)">done</button>
+        <button class="filter-btn" onclick="filterJobs('failed',this)">failed</button>
+        <button class="filter-btn" onclick="filterJobs('queued',this)">queued</button>
         <button class="filter-btn" onclick="clearHistory()" style="margin-left:auto;color:var(--red)">clear</button>
       </div>
-
       <div class="jobs-table">
-        <div class="table-header">
-          <span>type</span>
-          <span>status</span>
-          <span>payload</span>
-          <span>worker</span>
-          <span>time</span>
-        </div>
+        <div class="table-header"><span>type</span><span>status</span><span>payload</span><span>worker</span><span>time</span></div>
         <div id="jobs-tbody"></div>
       </div>
     </div>
 
-    <!-- WORKERS PANEL -->
+    <!-- WORKERS -->
     <div class="panel" id="panel-workers">
       <div class="chart-section">
-        <div class="section-header">
-          <div class="section-title">active goroutines</div>
-          <div style="font-family:var(--font-mono);font-size:11px;color:var(--dim)">live view</div>
-        </div>
+        <div class="section-header"><div class="section-title">active goroutines</div><div style="font-family:var(--font-mono);font-size:11px;color:var(--dim)">live view</div></div>
         <div class="workers-grid" id="worker-cards-full"></div>
       </div>
-
-      <div class="chart-section" style="margin-top:0">
-        <div class="section-header">
-          <div class="section-title">throughput — jobs done over time</div>
-        </div>
-        <div class="chart-wrap">
-          <canvas id="throughput-chart"></canvas>
-        </div>
+      <div class="chart-section">
+        <div class="section-header"><div class="section-title">throughput — jobs completed per interval</div></div>
+        <div class="chart-wrap"><canvas id="throughput-chart"></canvas></div>
       </div>
     </div>
 
   </div>
-  <footer style="
-    width: 100%;
-    text-align: center;
-    padding: 10px 0;
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--dim);
-    border-top: 1px solid var(--border);
-    background: var(--bg2);
-  ">
-    Developed By: <span style="color: var(--purple2);">Anubhav Harsh Sinha</span>
-  </footer>
 </main>
+</div>
+
+<footer>
+  Developed By: <span style="color:var(--purple2)">Anubhav Harsh Sinha</span>
+</footer>
 
 <div class="toast" id="toast"></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script>
-// ── CONFIG ──────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
+// CONFIG — update these with your Render URLs
+// ─────────────────────────────────────────────────────────────
 const PRODUCER_URL = 'https://workqueue-producer-kz2k.onrender.com';
+const WORKER_URL   = 'https://distributed-task-processing-system-worker.onrender.com';
+const POLL_MS      = 3000; // poll every 3 seconds
 
-// If worker NOT deployed → temporarily disable metrics
-const WORKER_URL = "https://distributed-task-processing-system-worker.onrender.com";
-const POLL_MS      = 3000;
-
-// ── STATE ───────────────────────────────────────────────────
-let jobHistory = JSON.parse(localStorage.getItem('wq_jobs') || '[]');
+// ─────────────────────────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────────────────────────
+let jobHistory    = JSON.parse(localStorage.getItem('wq_jobs') || '[]');
 let historyFilter = 'all';
-let queueHistory = new Array(30).fill(0);
-let doneHistory  = new Array(30).fill(0);
-let prevDone = 0;
+let queueHistory  = new Array(30).fill(0);
+let doneHistory   = new Array(30).fill(0);
+let prevDone      = 0;
+let pollCount     = 0;
+let consecutiveErrors = 0;
+// FIX: single interval reference — prevents duplicate timers
+let pollTimer     = null;
 let workers = [
-  { id: 1, status: 'idle', task: null },
-  { id: 2, status: 'idle', task: null },
-  { id: 3, status: 'idle', task: null },
+  {id:1,status:'idle',task:null},
+  {id:2,status:'idle',task:null},
+  {id:3,status:'idle',task:null},
 ];
 
-// ── NAVIGATION ──────────────────────────────────────────────
-function showPanel(name, btn) {
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
-  document.getElementById('panel-' + name).classList.add('active');
+// ─────────────────────────────────────────────────────────────
+// CHARTS — created once, updated in place every poll
+// ─────────────────────────────────────────────────────────────
+const chartOpts = {
+  responsive:true, maintainAspectRatio:false,
+  plugins:{legend:{display:false},tooltip:{enabled:false}},
+  scales:{
+    x:{display:false},
+    y:{display:true,min:0,
+      ticks:{color:'#3a4155',font:{family:'IBM Plex Mono',size:10},maxTicksLimit:4,stepSize:1},
+      grid:{color:'#1c2030'},border:{display:false}}
+  },
+  elements:{point:{radius:0}},
+  // FIX: animation:false prevents chart thrash on every update
+  animation:false,
+};
+const labels30 = Array.from({length:30},(_,i)=>i);
+
+const queueChart = new Chart(document.getElementById('queue-chart'),{
+  type:'line',
+  data:{labels:labels30,datasets:[{
+    data:[...queueHistory],
+    borderColor:'#7c6ff7',backgroundColor:'rgba(124,111,247,.08)',
+    borderWidth:1.5,fill:true,tension:0.4
+  }]},
+  options:chartOpts,
+});
+
+const throughputChart = new Chart(document.getElementById('throughput-chart'),{
+  type:'bar',
+  data:{labels:labels30,datasets:[{
+    data:[...doneHistory],
+    backgroundColor:'rgba(61,214,140,.3)',borderColor:'#3dd68c',
+    borderWidth:1,borderRadius:2
+  }]},
+  options:chartOpts,
+});
+
+// ─────────────────────────────────────────────────────────────
+// NAVIGATION
+// ─────────────────────────────────────────────────────────────
+function showPanel(name,btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
+  document.getElementById('panel-'+name).classList.add('active');
   btn.classList.add('active');
-  const titles = { dashboard:'dashboard', submit:'submit job', history:'job history', workers:'workers' };
-  document.getElementById('page-title').innerHTML = `/ <span>${titles[name]}</span>`;
-  if (name === 'history') renderHistory();
-  if (name === 'workers') renderWorkersFull();
+  const titles={dashboard:'dashboard',submit:'submit job',history:'job history',workers:'workers'};
+  document.getElementById('page-title').innerHTML=`/ <span>${titles[name]}</span>`;
+  if(name==='history') renderHistory();
+  if(name==='workers') renderWorkersFull();
 }
 
-// ── METRICS (REAL-TIME) ─────────────────────────────────────
-async function fetchMetrics() {
+// ─────────────────────────────────────────────────────────────
+// CORE POLL — called on a single clean interval
+// ─────────────────────────────────────────────────────────────
+async function poll() {
   try {
-    const res = await fetch(WORKER_URL + '/metrics');
-    if (!res.ok) throw new Error('non-200');
+    // FIX: AbortSignal.timeout(5000) prevents hung fetches from stacking up
+    const res = await fetch(WORKER_URL+'/metrics', {
+      signal: AbortSignal.timeout(5000)
+    });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
 
     const data = await res.json();
 
-    const q    = data.total_jobs_in_queue ?? 0;
-    const done = data.jobs_done ?? 0;
-    const fail = data.jobs_failed ?? 0;
-
+    const q    = Number(data.total_jobs_in_queue) || 0;
+    const done = Number(data.jobs_done)           || 0;
+    const fail = Number(data.jobs_failed)         || 0;
     const total = done + fail;
-    const rate  = total > 0 ? Math.round((done / total) * 100) : 100;
+    const rate  = total > 0 ? Math.round(done/total*100) : 100;
 
-    // ── Update UI ──
-    document.getElementById('m-queue').textContent  = q;
-    document.getElementById('m-done').textContent   = done;
-    document.getElementById('m-failed').textContent = fail;
-    document.getElementById('m-rate').textContent   = rate + '%';
+    // FIX: flash metric values when they change
+    updateMetric('m-queue',  q);
+    updateMetric('m-done',   done);
+    updateMetric('m-failed', fail);
+    updateMetric('m-rate',   rate+'%');
+
+    pollCount++;
+    consecutiveErrors = 0;
 
     document.getElementById('last-update').textContent =
-      new Date().toLocaleTimeString([], {
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit'
-      });
+      new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+    document.getElementById('poll-count').textContent = `polls: ${pollCount}`;
 
-    // ── Update charts ──
-    queueHistory.push(q);
-    queueHistory.shift();
-
-    const delta = done - prevDone;
-    doneHistory.push(delta > 0 ? delta : 0);
-    doneHistory.shift();
-
+    // Update rolling history arrays
+    queueHistory.push(q);   queueHistory.shift();
+    const delta = Math.max(0, done - prevDone);
+    doneHistory.push(delta); doneHistory.shift();
     prevDone = done;
 
+    // FIX: update chart data arrays directly — no re-create
     queueChart.data.datasets[0].data = [...queueHistory];
-    queueChart.update('none');
+    queueChart.update('none'); // 'none' = skip animation
 
     throughputChart.data.datasets[0].data = [...doneHistory];
     throughputChart.update('none');
 
-    // ── Worker simulation ──
-    simulateWorkers(q, done);
+    simulateWorkers(q);
     renderWorkersDash();
     renderWorkersFull();
-
     document.getElementById('worker-summary').textContent =
-      workers.filter(w => w.status === 'busy').length +
-      ' busy / ' + workers.length + ' total';
+      workers.filter(w=>w.status==='busy').length+' busy / '+workers.length+' total';
 
-  } catch (e) {
-    console.log("Metrics error:", e);
+    setStatus('ok');
+    hideError();
 
-    document.getElementById('m-queue').textContent  = 'ERR';
-    document.getElementById('m-done').textContent   = 'ERR';
-    document.getElementById('m-failed').textContent = 'ERR';
-    document.getElementById('m-rate').textContent   = '–';
+  } catch(e) {
+    consecutiveErrors++;
+    setStatus('err');
+
+    // Only show error banner after 3 consecutive failures
+    // (avoids false alarm on a single slow response)
+    if (consecutiveErrors >= 3) {
+      showError(`Cannot reach worker at ${WORKER_URL} — retrying every ${POLL_MS/1000}s`);
+    }
+
+    document.getElementById('last-update').textContent = 'last attempt: '+
+      new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'});
   }
 }
 
-// ── INITIAL LOAD ──
-fetchMetrics();
+// FIX: flash animation when a value actually changes
+function updateMetric(id, newVal) {
+  const el = document.getElementById(id);
+  if (el.textContent !== String(newVal)) {
+    el.textContent = newVal;
+    el.classList.remove('flash');
+    void el.offsetWidth; // reflow to restart animation
+    el.classList.add('flash');
+  }
+}
 
-// ── AUTO REFRESH (REAL-TIME) ──
-setInterval(fetchMetrics, 2000); // every 2 seconds
-function simulateWorkers(qLen, done) {
-  const taskTypes = ['send_email','resize_image','generate_pdf'];
-  workers.forEach((w, i) => {
-    if (qLen > i) {
-      w.status = 'busy';
-      w.task = taskTypes[Math.floor(Math.random() * taskTypes.length)];
-    } else {
-      w.status = 'idle';
-      w.task = null;
-    }
+function setStatus(state) {
+  const dot  = document.getElementById('dot-top');
+  const badge= document.getElementById('live-badge');
+  const label= document.getElementById('live-label');
+  const dotW = document.getElementById('dot-worker');
+  if (state==='ok') {
+    dot.className='status-dot ok';
+    badge.className='live-badge ok';
+    label.textContent='live';
+    dotW.className='status-dot ok';
+  } else {
+    dot.className='status-dot err';
+    badge.className='live-badge err';
+    label.textContent='disconnected';
+    dotW.className='status-dot err';
+  }
+}
+
+function showError(msg){
+  const b=document.getElementById('error-banner');
+  b.textContent=msg; b.style.display='block';
+}
+function hideError(){
+  document.getElementById('error-banner').style.display='none';
+}
+
+// ─────────────────────────────────────────────────────────────
+// WORKER CARDS
+// ─────────────────────────────────────────────────────────────
+function simulateWorkers(qLen){
+  const types=['send_email','resize_image','generate_pdf'];
+  workers.forEach((w,i)=>{
+    if(qLen>i){w.status='busy';w.task=types[i%types.length];}
+    else{w.status='idle';w.task=null;}
   });
 }
 
-// ── WORKER CARDS ────────────────────────────────────────────
-function workerCardHTML(w) {
-  return `<div class="worker-card ${w.status === 'busy' ? 'busy' : ''}">
+function workerCardHTML(w){
+  return `<div class="worker-card ${w.status==='busy'?'busy':''}">
     <div class="worker-header">
       <div class="worker-id">goroutine #${w.id}</div>
       <div class="worker-status ${w.status}">${w.status}</div>
     </div>
-    <div class="worker-task ${w.status === 'busy' ? 'active' : ''}">
-      ${w.status === 'busy' ? '▶ ' + w.task : '— waiting on BLPop'}
+    <div class="worker-task ${w.status==='busy'?'active':''}">
+      ${w.status==='busy'?'▶ '+w.task:'— waiting on BLPop'}
     </div>
   </div>`;
 }
+function renderWorkersDash(){document.getElementById('worker-cards-dash').innerHTML=workers.map(workerCardHTML).join('');}
+function renderWorkersFull(){document.getElementById('worker-cards-full').innerHTML=workers.map(workerCardHTML).join('');}
 
-function renderWorkersDash() {
-  document.getElementById('worker-cards-dash').innerHTML =
-    workers.map(workerCardHTML).join('');
-}
-function renderWorkersFull() {
-  document.getElementById('worker-cards-full').innerHTML =
-    workers.map(workerCardHTML).join('');
-}
-
-// ── CHARTS ──────────────────────────────────────────────────
-const chartDefaults = {
-  responsive: true, maintainAspectRatio: false,
-  plugins: { legend: { display: false }, tooltip: { enabled: false } },
-  scales: {
-    x: { display: false },
-    y: {
-      display: true, min: 0,
-      ticks: {
-        color: '#3a4155', font: { family: 'IBM Plex Mono', size: 10 },
-        maxTicksLimit: 4, stepSize: 1,
-      },
-      grid: { color: '#1c2030' },
-      border: { display: false },
-    }
-  },
-  elements: { point: { radius: 0 } },
-  animation: false,
+// ─────────────────────────────────────────────────────────────
+// SUBMIT
+// ─────────────────────────────────────────────────────────────
+const fieldDefs={
+  send_email:[{id:'to',label:'to (email)',placeholder:'user@example.com'},{id:'subject',label:'subject',placeholder:'Welcome!'}],
+  resize_image:[{id:'new_x',label:'new width (px)',placeholder:'800'},{id:'new_y',label:'new height (px)',placeholder:'600'}],
+  generate_pdf:[{id:'title',label:'document title (optional)',placeholder:'My Report'}],
 };
 
-const labels30 = Array.from({length:30}, (_,i) => i);
-
-const queueChart = new Chart(document.getElementById('queue-chart'), {
-  type: 'line',
-  data: {
-    labels: labels30,
-    datasets: [{
-      data: [...queueHistory],
-      borderColor: '#7c6ff7',
-      backgroundColor: 'rgba(124,111,247,.08)',
-      borderWidth: 1.5,
-      fill: true,
-      tension: 0.4,
-    }]
-  },
-  options: chartDefaults,
-});
-
-const throughputChart = new Chart(document.getElementById('throughput-chart'), {
-  type: 'bar',
-  data: {
-    labels: labels30,
-    datasets: [{
-      data: [...doneHistory],
-      backgroundColor: 'rgba(61,214,140,.3)',
-      borderColor: '#3dd68c',
-      borderWidth: 1,
-      borderRadius: 2,
-    }]
-  },
-  options: {
-    ...chartDefaults,
-    scales: {
-      ...chartDefaults.scales,
-      y: { ...chartDefaults.scales.y, min: 0 },
-    }
-  },
-});
-
-// ── SUBMIT ──────────────────────────────────────────────────
-const fieldDefs = {
-  send_email:   [{id:'to', label:'to (email)', placeholder:'user@example.com'},{id:'subject', label:'subject', placeholder:'Welcome!'}],
-  resize_image: [{id:'new_x', label:'new width (px)', placeholder:'800'},{id:'new_y', label:'new height (px)', placeholder:'600'}],
-  generate_pdf: [{id:'title', label:'document title (optional)', placeholder:'My Report'}],
-};
-
-function updateFields() {
-  const type = document.getElementById('task-type').value;
-  const fields = fieldDefs[type] || [];
-  document.getElementById('dynamic-fields').innerHTML = fields.map(f => `
+function updateFields(){
+  const type=document.getElementById('task-type').value;
+  document.getElementById('dynamic-fields').innerHTML=(fieldDefs[type]||[]).map(f=>`
     <div>
       <label class="form-label">${f.label}</label>
       <input class="form-input" id="field-${f.id}" placeholder="${f.placeholder}">
-    </div>
-  `).join('');
-  document.getElementById('response-box').style.display = 'none';
+    </div>`).join('');
+  document.getElementById('response-box').style.display='none';
 }
 
-async function submitJob() {
-  const type    = document.getElementById('task-type').value;
-  const retries = parseInt(document.getElementById('task-retries').value) || 3;
-  const fields  = fieldDefs[type] || [];
-
-  const payload = {};
-  for (const f of fields) {
-    const val = document.getElementById('field-' + f.id)?.value?.trim();
-    if (val) payload[f.id] = val;
-  }
-
-  const body = { type, retries, payload };
-  const btn  = document.getElementById('submit-btn');
-  const box  = document.getElementById('response-box');
-
-  btn.disabled = true;
-  btn.textContent = 'submitting...';
-
-  try {
-    const res = await fetch(PRODUCER_URL + '/enqueue', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
+async function submitJob(){
+  const type=document.getElementById('task-type').value;
+  const retries=parseInt(document.getElementById('task-retries').value)||3;
+  const payload={};
+  (fieldDefs[type]||[]).forEach(f=>{
+    const v=document.getElementById('field-'+f.id)?.value?.trim();
+    if(v) payload[f.id]=v;
+  });
+  const btn=document.getElementById('submit-btn');
+  const box=document.getElementById('response-box');
+  btn.disabled=true; btn.textContent='submitting...';
+  try{
+    const res=await fetch(PRODUCER_URL+'/enqueue',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({type,retries,payload}),
     });
-    const text = await res.text();
-    if (res.ok) {
-      box.className = 'response-box ok';
-      box.textContent = '✓ ' + text;
-      box.style.display = 'block';
-      addToHistory({ type, status: 'queued', payload, worker: '–', time: new Date() });
-      showToast('Task queued successfully');
-      await fetchMetrics();
+    const text=await res.text();
+    if(res.ok){
+      box.className='response-box ok';box.textContent='✓ '+text;box.style.display='block';
+      addToHistory({type,status:'queued',payload,worker:'–',time:new Date()});
+      showToast('Task queued');
+      // Immediately poll so metrics update right away
+      setTimeout(poll, 500);
     } else {
-      box.className = 'response-box err';
-      box.textContent = '✗ ' + text;
-      box.style.display = 'block';
+      box.className='response-box err';box.textContent='✗ '+text;box.style.display='block';
     }
-  } catch(e) {
-    box.className = 'response-box err';
-    box.textContent = '✗ Could not reach producer at ' + PRODUCER_URL + '. Is it running?';
-    box.style.display = 'block';
+  } catch(e){
+    box.className='response-box err';
+    box.textContent='✗ Could not reach producer at '+PRODUCER_URL;
+    box.style.display='block';
   }
-
-  btn.disabled = false;
-  btn.textContent = 'submit task →';
+  btn.disabled=false; btn.textContent='submit task →';
 }
 
-// ── HISTORY ─────────────────────────────────────────────────
-function addToHistory(job) {
+// ─────────────────────────────────────────────────────────────
+// HISTORY
+// ─────────────────────────────────────────────────────────────
+function addToHistory(job){
   jobHistory.unshift(job);
-  localStorage.setItem('wq_jobs', JSON.stringify(jobHistory.slice(0, 200)));
-  if (document.getElementById('panel-history').classList.contains('active')) {
-    renderHistory();
-  }
+  localStorage.setItem('wq_jobs',JSON.stringify(jobHistory.slice(0,200)));
+  if(document.getElementById('panel-history').classList.contains('active')) renderHistory();
 }
-
-function filterJobs(f, btn) {
-  historyFilter = f;
-  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+function filterJobs(f,btn){
+  historyFilter=f;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   renderHistory();
 }
-
-function clearHistory() {
-  jobHistory = [];
-  localStorage.removeItem('wq_jobs');
-  renderHistory();
+function clearHistory(){
+  jobHistory=[];localStorage.removeItem('wq_jobs');renderHistory();
 }
-
-function renderHistory() {
-  const filtered = historyFilter === 'all'
-    ? jobHistory
-    : jobHistory.filter(j => j.status === historyFilter);
-
-  if (filtered.length === 0) {
-    document.getElementById('jobs-tbody').innerHTML =
-      '<div class="empty-state">no jobs found</div>';
+function renderHistory(){
+  const filtered=historyFilter==='all'?jobHistory:jobHistory.filter(j=>j.status===historyFilter);
+  if(!filtered.length){
+    document.getElementById('jobs-tbody').innerHTML='<div class="empty-state">no jobs found</div>';
     return;
   }
-
-  document.getElementById('jobs-tbody').innerHTML = filtered.map(j => {
-    const payloadStr = Object.entries(j.payload || {})
-      .map(([k,v]) => `${k}: ${v}`).join(' · ') || '–';
-    const timeStr = j.time
-      ? new Date(j.time).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'})
-      : '–';
+  document.getElementById('jobs-tbody').innerHTML=filtered.map(j=>{
+    const p=Object.entries(j.payload||{}).map(([k,v])=>`${k}: ${v}`).join(' · ')||'–';
+    const t=j.time?new Date(j.time).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit',second:'2-digit'}):'–';
     return `<div class="table-row">
       <span style="color:var(--purple2)">${j.type}</span>
       <span><span class="status-badge status-${j.status}">${j.status}</span></span>
-      <span style="color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${payloadStr}</span>
+      <span style="color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p}</span>
       <span style="color:var(--dim)">${j.worker}</span>
-      <span style="color:var(--dim)">${timeStr}</span>
+      <span style="color:var(--dim)">${t}</span>
     </div>`;
   }).join('');
 }
 
-// ── TOAST ────────────────────────────────────────────────────
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2500);
+// ─────────────────────────────────────────────────────────────
+// TOAST
+// ─────────────────────────────────────────────────────────────
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2500);
 }
 
-// ── SEED DEMO DATA ────────────────────────────────────────────
-if (jobHistory.length === 0) {
-  const demo = [
-    { type:'send_email',   status:'done',   payload:{to:'alice@example.com', subject:'Welcome!'}, worker:'#1', time: new Date(Date.now()-120000) },
-    { type:'resize_image', status:'done',   payload:{new_x:'800', new_y:'600'}, worker:'#2', time: new Date(Date.now()-90000) },
-    { type:'generate_pdf', status:'failed', payload:{title:'Q3 Report'}, worker:'#3', time: new Date(Date.now()-60000) },
-    { type:'send_email',   status:'done',   payload:{to:'bob@example.com', subject:'Reset pw'}, worker:'#1', time: new Date(Date.now()-30000) },
-    { type:'resize_image', status:'queued', payload:{new_x:'1920', new_y:'1080'}, worker:'–', time: new Date() },
+// ─────────────────────────────────────────────────────────────
+// SEED DEMO DATA (only if no history saved)
+// ─────────────────────────────────────────────────────────────
+if(!jobHistory.length){
+  jobHistory=[
+    {type:'send_email',status:'done',payload:{to:'alice@example.com',subject:'Welcome!'},worker:'#1',time:new Date(Date.now()-120000)},
+    {type:'resize_image',status:'done',payload:{new_x:'800',new_y:'600'},worker:'#2',time:new Date(Date.now()-90000)},
+    {type:'generate_pdf',status:'failed',payload:{title:'Q3 Report'},worker:'#3',time:new Date(Date.now()-60000)},
+    {type:'send_email',status:'done',payload:{to:'bob@example.com',subject:'Reset'},worker:'#1',time:new Date(Date.now()-30000)},
   ];
-  jobHistory = demo;
 }
 
-// ── INIT ──────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
+// INIT — single interval, no duplicates
+// ─────────────────────────────────────────────────────────────
 updateFields();
 renderWorkersDash();
 renderWorkersFull();
-fetchMetrics();
-setInterval(fetchMetrics, POLL_MS);
+renderHistory();
+
+// First poll immediately
+poll();
+
+// FIX: ONE setInterval, stored in pollTimer so it can never be created twice
+if (pollTimer) clearInterval(pollTimer);
+pollTimer = setInterval(poll, POLL_MS);
 </script>
 </body>
 </html>
