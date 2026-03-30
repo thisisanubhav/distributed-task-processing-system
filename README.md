@@ -3,7 +3,7 @@
 A Distributed Background Task Processing System written in Go, using Redis for job queuing.
 
 **High level overview**
-    ![overview](WorkQueue.pn)
+    ![overview](distributed_task_system_architecture.png)
 
 
 ## What's the need for this?
