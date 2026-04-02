@@ -1448,8 +1448,9 @@ async function fetchMetrics(manual = false) {
     if (!response.ok) throw new Error('Bad response');
     const data = await response.json();
 
-    metricsMode = 'live';
-    updateModeUI();
+    document.getElementById('worker-endpoint-label').textContent = 'connected';
+    document.getElementById('worker-endpoint-label').style.color = '#54e0c1';
+
     applyMetrics(data);
 
     if (manual) {
@@ -1457,6 +1458,10 @@ async function fetchMetrics(manual = false) {
     }
   } catch (error) {
     console.error('Metrics fetch failed:', error);
+
+    document.getElementById('worker-endpoint-label').textContent = 'offline';
+    document.getElementById('worker-endpoint-label').style.color = '#ff8d76';
+
     if (manual) {
       showToast('Worker metrics unavailable');
     }
@@ -1733,19 +1738,6 @@ async function checkProducerStatus() {
   }
 }
 
-async function checkWorkerStatus() {
-  try {
-    const res = await fetch(WORKER_URL + '/metrics');
-    if (!res.ok) throw new Error();
-
-    document.getElementById('worker-endpoint-label').textContent = 'connected';
-    document.getElementById('worker-endpoint-label').style.color = '#54e0c1';
-  } catch (err) {
-    document.getElementById('worker-endpoint-label').textContent = 'offline';
-    document.getElementById('worker-endpoint-label').style.color = '#ff8d76';
-  }
-}
-
 if (jobHistory.length === 0) {
   jobHistory = [
     { type: 'send_email', status: 'done', payload: { to: 'alice@example.com', subject: 'Welcome!' }, worker: '#1', time: new Date(Date.now() - 120000) },
@@ -1763,11 +1755,9 @@ renderWorkersFull();
 renderHistory();
 fetchMetrics();
 checkProducerStatus();
-checkWorkerStatus();
 setInterval(() => {
   fetchMetrics();
   checkProducerStatus();
-  checkWorkerStatus();
 }, POLL_MS);
 </script>
 </body>
