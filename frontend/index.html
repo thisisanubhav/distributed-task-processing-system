@@ -1008,7 +1008,7 @@
     <section class="sidebar-group">
       <div class="group-label">Runtime</div>
       <div class="stack">
-        <div class="stack-row"><span>Producer</span><span>:8080</span></div>
+        <div class="stack-row"><span>Producer</span><span id="producer-status">offline</span></div>
         <div class="stack-row"><span>Worker</span><span id="worker-endpoint-label">offline</span></div>
         <div class="stack-row"><span>Polling</span><span>3s cadence</span></div>
       </div>
@@ -1381,7 +1381,6 @@ function updateModeUI() {
   document.getElementById('poll-label').textContent = 'auto-refresh active';
   document.getElementById('worker-mode-pill').textContent = 'live metrics';
   document.getElementById('signal-mode').textContent = 'live worker telemetry';
-  document.getElementById('worker-endpoint-label').textContent = ':8081';
   document.getElementById('runtime-mode').textContent = 'worker telemetry online';
   document.getElementById('metrics-source').textContent = 'Metrics source: deployed worker endpoint';
 }
@@ -1720,6 +1719,33 @@ function showToast(message) {
   setTimeout(() => toast.classList.remove('show'), 2400);
 }
 
+async function checkProducerStatus() {
+  try {
+    await fetch(PRODUCER_URL + '/enqueue', {
+      method: 'OPTIONS',
+    });
+
+    document.getElementById('producer-status').textContent = 'connected';
+    document.getElementById('producer-status').style.color = '#54e0c1';
+  } catch (err) {
+    document.getElementById('producer-status').textContent = 'offline';
+    document.getElementById('producer-status').style.color = '#ff8d76';
+  }
+}
+
+async function checkWorkerStatus() {
+  try {
+    const res = await fetch(WORKER_URL + '/metrics');
+    if (!res.ok) throw new Error();
+
+    document.getElementById('worker-endpoint-label').textContent = 'connected';
+    document.getElementById('worker-endpoint-label').style.color = '#54e0c1';
+  } catch (err) {
+    document.getElementById('worker-endpoint-label').textContent = 'offline';
+    document.getElementById('worker-endpoint-label').style.color = '#ff8d76';
+  }
+}
+
 if (jobHistory.length === 0) {
   jobHistory = [
     { type: 'send_email', status: 'done', payload: { to: 'alice@example.com', subject: 'Welcome!' }, worker: '#1', time: new Date(Date.now() - 120000) },
@@ -1736,7 +1762,13 @@ renderWorkersDash();
 renderWorkersFull();
 renderHistory();
 fetchMetrics();
-setInterval(fetchMetrics, POLL_MS);
+checkProducerStatus();
+checkWorkerStatus();
+setInterval(() => {
+  fetchMetrics();
+  checkProducerStatus();
+  checkWorkerStatus();
+}, POLL_MS);
 </script>
 </body>
 </html>
