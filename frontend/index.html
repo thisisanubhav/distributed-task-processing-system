@@ -1065,7 +1065,7 @@
               <div class="strip-card">
                 <div class="strip-label">Workers busy</div>
                 <div class="strip-value" id="hero-busy">0 / 3</div>
-                <div class="strip-note">Simulated when the worker service is unavailable.</div>
+                <div class="strip-note">Reflects queue load and worker activity.</div>
               </div>
               <div class="strip-card">
                 <div class="strip-label">Success</div>
@@ -1726,9 +1726,8 @@ function showToast(message) {
 
 async function checkProducerStatus() {
   try {
-    await fetch(PRODUCER_URL + '/enqueue', {
-      method: 'OPTIONS',
-    });
+    const res = await fetch(PRODUCER_URL);
+    if (!res.ok) throw new Error();
 
     document.getElementById('producer-status').textContent = 'connected';
     document.getElementById('producer-status').style.color = '#54e0c1';
@@ -1753,7 +1752,9 @@ updateFields();
 renderWorkersDash();
 renderWorkersFull();
 renderHistory();
-fetchMetrics();
+setTimeout(() => {
+  fetchMetrics();
+}, 1500);
 checkProducerStatus();
 setInterval(() => {
   fetchMetrics();
