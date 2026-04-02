@@ -67,6 +67,15 @@ func main() {
 
 	http.HandleFunc("/enqueue", corsMiddleware(post_handler))
 
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("WorkQueue Producer is running 🚀"))
+	})
+
+	http.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("OK"))
+	})
+
 	log.Println("Starting producer server on port", PORT)
 
 	if err := http.ListenAndServe(PORT, nil); err != nil {
